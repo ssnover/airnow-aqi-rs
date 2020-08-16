@@ -11,8 +11,8 @@ fn main() -> std::io::Result<()> {
 
     let base_url = "http://www.airnowapi.org/aq/observation/zipCode/current/?format=application/json";
     let built_url = format!("{}&zipCode={}&API_KEY={}", base_url, 19123, key);
-    let response = reqwest::blocking::get(&built_url).unwrap();
-    println!("{:?}", response);
+    let response = reqwest::blocking::get(&built_url).unwrap().text().unwrap();
+    println!("{}", response);
 
     Ok(())
 }
