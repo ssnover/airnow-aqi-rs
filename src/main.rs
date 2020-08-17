@@ -9,10 +9,11 @@ fn main() -> std::io::Result<()> {
     let key = json::parse(&contents).unwrap();
     let key = key["api_key"].as_str().unwrap();
 
-    let base_url = "http://www.airnowapi.org/aq/observation/zipCode/current/?format=application/json";
-    let built_url = format!("{}&zipCode={}&API_KEY={}", base_url, 19123, key);
-    let response = reqwest::blocking::get(&built_url).unwrap().text().unwrap();
-    println!("{}", response);
+    let client = airnow_aqi::Airnow::new(key.to_string());
+    let obs = client.get_current_observations(19123, Some(25)).unwrap();
+    for element in obs {
+        println!("{:?}", element);
+    }
 
     Ok(())
 }
