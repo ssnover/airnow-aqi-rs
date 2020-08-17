@@ -3,13 +3,13 @@ This is a work-in-progress small crate to provide a convenient client for queryi
 
 This API requires an API key. Information about signing up for an API key can be found at the Airnow API website, along with more documentation on their available services: [Airnow API](https://docs.airnowapi.org/).
 
-Once you have an API key, it's simple enough to build a client and request data based on a zip code or (coming soon) a pair of latitude and longitude coordinates along with an optional distance to search for observations.
+Once you have an API key, it's simple enough to build a client and request data based on a zip code or a pair of latitude and longitude coordinates along with an optional distance to search for observations.
 
 ```rust
 let key = key["api_key"].as_str().unwrap();
 let client = airnow_aqi::Airnow::new(key.to_string());
 
-let observations = client.get_current_observations(19123, Some(25)).unwrap();
+let observations = client.get_current_observations_by_zipcode(19123, Some(25)).unwrap();
 
 for element in observations {
     println!("{:?}", element);

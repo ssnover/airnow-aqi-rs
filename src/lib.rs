@@ -1,7 +1,8 @@
-use serde::{Deserialize};
 use reqwest::blocking::Client;
+use serde::Deserialize;
 
-static AIRNOW_API_BASE_URL: &str = "http://www.airnowapi.org/aq/observation/zipCode/current/?format=application/json";
+static AIRNOW_API_URL_PREFIX: &str = "http://www.airnowapi.org/aq/observation/";
+static AIRNOW_API_URL_POSTFIX: &str = "/current/?format=application/json";
 
 pub struct Airnow {
     key: String,
@@ -33,15 +34,55 @@ pub struct ObservationResponse {
 
 impl Airnow {
     pub fn new(api_key: String) -> Airnow {
-        Airnow{key: api_key, client: Client::new()}
+        Airnow {
+            key: api_key,
+            client: Client::new(),
+        }
     }
 
-    pub fn get_current_observations(self, zip: u32, distance: Option<u64>) -> Result<Vec<ObservationResponse>, ()> {
-        let mut complete_url = format!("{}&zipCode={}&API_KEY={}", AIRNOW_API_BASE_URL, zip, self.key);
+    pub fn get_current_observations_by_zipcode(
+        &self,
+        zip: u32,
+        distance: Option<u64>,
+    ) -> Result<Vec<ObservationResponse>, ()> {
+        let mut complete_url = format!(
+            "{}zipCode{}&zipCode={}&API_KEY={}",
+            AIRNOW_API_URL_PREFIX, AIRNOW_API_URL_POSTFIX, zip, self.key
+        );
         if let Some(distance) = distance {
             complete_url.push_str(format!("&distance={}", distance).as_str());
         }
-        let response_body = self.client.get(&complete_url).send().unwrap().text().unwrap();
+        let response_body = self
+            .client
+            .get(&complete_url)
+            .send()
+            .unwrap()
+            .text()
+            .unwrap();
+        let obs: Vec<ObservationResponse> = serde_json::from_str(&response_body).unwrap();
+        Ok(obs)
+    }
+
+    pub fn get_current_observations_by_coordinate(
+        &self,
+        latitude: f64,
+        longitude: f64,
+        distance: Option<u64>,
+    ) -> Result<Vec<ObservationResponse>, ()> {
+        let mut complete_url = format!(
+            "{}latLong{}&latitude={}&longitude={}&API_KEY={}",
+            AIRNOW_API_URL_PREFIX, AIRNOW_API_URL_POSTFIX, latitude, longitude, self.key
+        );
+        if let Some(distance) = distance {
+            complete_url.push_str(format!("&distance={}", distance).as_str());
+        }
+        let response_body = self
+            .client
+            .get(&complete_url)
+            .send()
+            .unwrap()
+            .text()
+            .unwrap();
         let obs: Vec<ObservationResponse> = serde_json::from_str(&response_body).unwrap();
         Ok(obs)
     }
