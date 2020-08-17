@@ -3,6 +3,9 @@ name = "airnow-aqi-rs"
 version = "0.1.0"
 authors = ["Shane Snover <ssnover95@gmail.com>"]
 edition = "2018"
+description = "A convenience library for querying from the EPA AirNow API for Air Quality Index data."
+license = "MIT"
+readme = "README.md"
 
 [lib]
 name = "airnow_aqi"
